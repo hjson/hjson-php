@@ -1,0 +1,34 @@
+{
+	"name": "HJSON/HJSON",
+	"description": "JSON for Humans, allows comments and is less error prone.",
+	"license": "MIT",
+	"type": "library",
+    "authors": [
+        {
+            "name": "Issam Zoli",
+            "email": "jawbfl@gmail.com",
+            "role": "Developer"
+        }
+    ],
+    "version": "1.0.0",
+    "homepage": "https://github.com/laktak/hjson-php",
+    "keywords": [
+        "json",
+        "comments",
+        "config",
+        "hjson",
+        "parser",
+        "serializer",
+        "human"
+    ],
+	"require": {
+    },
+    "require-dev": {
+        "phpunit/phpunit": "~4.0"
+    },
+	"autoload": {
+        "psr-4": {
+            "HJSON\\": "src/HJSON"
+        }
+    }
+}
