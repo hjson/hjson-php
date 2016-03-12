@@ -1,8 +1,8 @@
 {
-	"name": "HJSON/HJSON",
-	"description": "JSON for Humans, allows comments and is less error prone.",
-	"license": "MIT",
-	"type": "library",
+    "name": "HJSON/HJSON",
+    "description": "JSON for Humans, allows comments and is less error prone.",
+    "license": "MIT",
+    "type": "library",
     "authors": [
         {
             "name": "Issam Zoli",
@@ -21,12 +21,12 @@
         "serializer",
         "human"
     ],
-	"require": {
+        "require": {
     },
     "require-dev": {
         "phpunit/phpunit": "~4.0"
     },
-	"autoload": {
+        "autoload": {
         "psr-4": {
             "HJSON\\": "src/HJSON"
         }
