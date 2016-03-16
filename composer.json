@@ -10,7 +10,6 @@
             "role": "Developer"
         }
     ],
-    "version": "1.0.0",
     "homepage": "https://github.com/laktak/hjson-php",
     "keywords": [
         "json",
