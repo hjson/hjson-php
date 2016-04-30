@@ -2,8 +2,8 @@
 
 namespace HJSON;
 
-function mb_str_split( $string ) { 
-    return preg_split('/(?<!^)(?!$)/u', $string ); 
+function mb_str_split( $string ) {
+    return preg_split('/(?<!^)(?!$)/u', $string );
 }
 
 class HJSONStringifier {
@@ -12,10 +12,10 @@ class HJSONStringifier {
     private $needsQuotes = '/[\x00-\x1f\x7f-\x9f\x{00ad}\x{0600}-\x{0604}\x{070f}\x{17b4}\x{17b5}\x{200c}-\x{200f}\x{2028}-\x{202f}\x{2060}-\x{206f}\x{feff}\x{fff0}-\x{ffff}\x]/u'; // like needsEscape but without \\ and \"
     private $needsEscapeML = '/\'\'\'|[\x00-\x09\x0b\x0c\x0e-\x1f\x7f-\x9f\x{00ad}\x{0600}-\x{0604}\x{070f}\x{17b4}\x{17b5}\x{200c}-\x{200f}\x{2028}-\x{202f}\x{2060}-\x{206f}\x{feff}\x{fff0}-\x{ffff}\x]/u'; // ''' || (needsQuotes but without \n and \r)
     private $startsWithKeyword = '/^(true|false|null)\s*((,|\]|\}|#|\/\/|\/\*).*)?$/';
-    private $needsEscapeName = '/[,\{\[\}\]\s]/';
+    private $needsEscapeName = '/[,\{\[\}\]\s:#"]|\/\/|\/\*|\'\'\'/';
     private $gap = '';
     private $indent = '  ';
-    
+
     // options
     private $eol;
     private $keepWsc;
@@ -111,6 +111,7 @@ class HJSONStringifier {
         if ($doEscape ||
             $this->isWhite($first) ||
             $first === '"' ||
+            $first === "'" && $string[1] === "'" && $string[2] === "'" ||
             $first === '#' ||
             $first === '/' && ($string[1] === '*' || $string[1] === '/') ||
             $first === '{' ||
@@ -128,11 +129,11 @@ class HJSONStringifier {
             if (!preg_match($this->needsEscape, $string)) {
                 return '"' . $string . '"';
             }
-            
+
             else if (!preg_match($this->needsEscapeML, $string) && !$isRootObject) {
                 return $this->mlString($string, $gap);
             }
-            
+
             else {
                 return '"' . $this->quoteReplace($string) . '"';
             }
@@ -214,9 +215,9 @@ class HJSONStringifier {
 
             case 'object':
             case 'array':
-                
+
                 $isArray = is_array($value);
-                
+
                 $kw = null; $kwl = null; // whitespace & comments
                 if ($this->keepWsc) {
                     if ($isArray) $kw = @$value['__WSC__'];

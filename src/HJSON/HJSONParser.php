@@ -29,14 +29,19 @@ class HJSONParser {
 
         $this->keepWsc = $options && $options['keepWsc'];
         $this->text = $source;
-        $this->at = 0;
-        $this->ch = ' ';
+        $this->resetAt();
         $result = $this->rootValue();
         $this->white();
-        
+
         if ($this->ch) throw new HJSONException("Syntax error, found trailing characters");
 
         return $result;
+    }
+
+    function resetAt()
+    {
+        $this->at = 0;
+        $this->ch = ' ';
     }
 
     public function parseWsc($source, $options=[])
@@ -53,12 +58,16 @@ class HJSONParser {
             case '[': return $this->_array();
         }
 
-        // look if we are dealing with a single JSON value (true/false/null/num/"")
-        // if it is multiline we assume it's a Hjson object without root braces.
-        for ($i = 0; $i < mb_strlen($this->text); $i++)
-            if ($this->text[$i] === "\n") return $this->object(true);
-
-        return $this->value();
+        try {
+          // assume we have a root object without braces
+          return $this->object(true);
+        }
+        catch (HJSONException $e) {
+            // test if we are dealing with a single JSON value instead (true/false/null/num/"")
+            $this->resetAt();
+            try { return $this->value(); }
+            catch (HJSONException $e2) { throw $e; } // throw original error
+        }
     }
 
     private function value()
@@ -111,7 +120,7 @@ class HJSONParser {
         // assumeing ch === '['
 
         $array = []; $kw = null; $wat = null;
-        
+
         if ($this->keepWsc) {
             $array['__WSC__'] = [];
             $kw = &$array['__WSC__'];
@@ -318,7 +327,8 @@ class HJSONParser {
                 return $name;
             }
             else if ($this->ch <= ' ') {
-                if ($space < 0) $space = mb_strlen($name);
+                if (!$this->ch) $this->error("Found EOF while looking for a key name (check your syntax)");
+                else if ($space < 0) $space = mb_strlen($name);
             }
             else if ($this->ch === '{' || $this->ch === '}' || $this->ch === '[' || $this->ch === ']' || $this->ch === ',') {
                 $this->error("Found '{$this->ch}' where a key name was expected (check your syntax or use quotes if the key name includes {}[],: or whitespace)");
@@ -333,10 +343,11 @@ class HJSONParser {
         // Hjson strings can be quoteless
         // returns string, true, false, or null.
         $value = $this->ch;
-        while ($this->next() !== null) {
+        while (true) {
+            $isEol = $this->next() === null;
             if (mb_strlen($value) === 3 && $value === "'''") return $this->mlString();
-            $isEol = $this->ch === "\r" || $this->ch === "\n";
-            
+            $isEol = $isEol || $this->ch === "\r" || $this->ch === "\n";
+
             if ($isEol || $this->ch === ',' ||
                 $this->ch === '}' || $this->ch === ']' ||
                 $this->ch === '#' ||
@@ -360,8 +371,6 @@ class HJSONParser {
             }
             $value .= $this->ch;
         }
-
-        $this->error("End of input while parsing a value");
     }
 
     private function getComment($wat)
@@ -369,15 +378,15 @@ class HJSONParser {
         $i; $wat--;
         // remove trailing whitespace
         for ($i = $this->at - 2; $i > $wat && $this->text[$i] <= ' ' && $this->text[$i] !== "\n"; $i--);
-        
+
         // but only up to EOL
         if ($this->text[$i] === "\n") $i--;
         if ($this->text[$i] === "\r") $i--;
-        
+
         $res = mb_substr($this->text, $wat, $i-$wat+1);
         for ($i = 0; $i < mb_strlen($res); $i++)
             if ($res[$i] > ' ') return $res;
-        
+
         return "";
     }
 }
