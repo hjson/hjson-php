@@ -25,20 +25,12 @@ class HJSONParser {
 
     public function parse($source, $options=[])
     {
-        $result;
-
         $this->keepWsc = $options && $options['keepWsc'];
         $this->text = $source;
-        $this->resetAt();
-        $result = $this->rootValue();
-        $this->white();
-
-        if ($this->ch) throw new HJSONException("Syntax error, found trailing characters");
-
-        return $result;
+        return $this->rootValue();
     }
 
-    function resetAt()
+    private function resetAt()
     {
         $this->at = 0;
         $this->ch = ' ';
@@ -49,23 +41,32 @@ class HJSONParser {
         return $this->parse($source, array_merge($options, ['keepWsc' => true]));
     }
 
+    private function checkExit($result)
+    {
+        $this->white();
+        if ($this->ch !== null) $this->error("Syntax error, found trailing characters!");
+        return $result;
+    }
+
     private function rootValue()
     {
         // Braces for the root object are optional
+
+        $this->resetAt();
         $this->white();
         switch ($this->ch) {
-            case '{': return $this->object();
-            case '[': return $this->_array();
+            case '{': return $this->checkExit($this->object());
+            case '[': return $this->checkExit($this->_array());
         }
 
         try {
           // assume we have a root object without braces
-          return $this->object(true);
+          return $this->checkExit($this->object(true));
         }
         catch (HJSONException $e) {
             // test if we are dealing with a single JSON value instead (true/false/null/num/"")
             $this->resetAt();
-            try { return $this->value(); }
+            try { return $this->checkExit($this->value()); }
             catch (HJSONException $e2) { throw $e; } // throw original error
         }
     }
@@ -272,7 +273,7 @@ class HJSONParser {
         $indent = 0;
         while (true) {
             $c = $this->peek(-$indent-5);
-            if (!$c || $c === "\n") break;
+            if ($c === null || $c === "\n") break;
             $indent++;
         }
 
@@ -282,7 +283,7 @@ class HJSONParser {
 
         // When parsing multiline string values, we must look for ' characters.
         while (true) {
-            if (!$this->ch) $this->error("Bad multiline string");
+            if ($this->ch === null) $this->error("Bad multiline string");
             else if ($this->ch === '\'') {
                 $triple++;
                 $this->next();
