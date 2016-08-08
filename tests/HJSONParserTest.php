@@ -67,7 +67,7 @@ class HJSONParserTest extends PHPUnit_Framework_TestCase {
             $isJson = $name[1] === "json";
             $name = $name[0];
 
-            // skip empty test
+            // skip empty test, empty keys are not supported by PHP
             if ($name === "empty") continue;
 
             $this->runEach($name, $file, $isJson, false, false);

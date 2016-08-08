@@ -41,6 +41,10 @@ class HJSONParser {
         return $this->parse($source, array_merge($options, ['keepWsc' => true]));
     }
 
+    private function isPunctuatorChar($c) {
+      return $c === '{' || $c === '}' || $c === '[' || $c === ']' || $c === ',' || $c === ':';
+    }
+
     private function checkExit($result)
     {
         $this->white();
@@ -331,7 +335,7 @@ class HJSONParser {
                 if (!$this->ch) $this->error("Found EOF while looking for a key name (check your syntax)");
                 else if ($space < 0) $space = mb_strlen($name);
             }
-            else if ($this->ch === '{' || $this->ch === '}' || $this->ch === '[' || $this->ch === ']' || $this->ch === ',') {
+            else if ($this->isPunctuatorChar($this->ch)) {
                 $this->error("Found '{$this->ch}' where a key name was expected (check your syntax or use quotes if the key name includes {}[],: or whitespace)");
             }
             else $name .= $this->ch;
@@ -343,6 +347,10 @@ class HJSONParser {
     {
         // Hjson strings can be quoteless
         // returns string, true, false, or null.
+
+        if ($this->isPunctuatorChar($this->ch))
+          $this->error("Found a punctuator character '{$this->ch}' when excpecting a quoteless string (check your syntax)");
+
         $value = $this->ch;
         while (true) {
             $isEol = $this->next() === null;
