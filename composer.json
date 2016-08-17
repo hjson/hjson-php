@@ -10,7 +10,7 @@
             "role": "Developer"
         }
     ],
-    "homepage": "https://github.com/laktak/hjson-php",
+    "homepage": "https://github.com/hjson/hjson-php",
     "keywords": [
         "json",
         "comments",
