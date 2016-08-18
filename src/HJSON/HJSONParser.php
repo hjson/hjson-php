@@ -105,8 +105,9 @@ class HJSONParser {
                         for ($i = 0; $i < 4; $i++) {
                             $uffff .= $this->next();
                         }
-                        $uffff = json_decode('"\u' . $uffff . '"');
-                        $string .= $uffff;
+                        if (!ctype_xdigit($uffff))
+                            $this->error("Bad \\u char");
+                        $string .= mb_convert_encoding(pack('H*', $uffff), 'UTF-8', 'UTF-16BE');
                     }
                     else if (@$this->escapee[$this->ch]) {
                         $string .= $this->escapee[$this->ch];
