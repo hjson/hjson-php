@@ -131,3 +131,7 @@ $wsc2[0] .= ' world';
 // convert back to Hjson
 $text2 = $stringifier->stringifyWsc($data);
 ```
+
+# History
+
+[see releases](https://github.com/hjson/hjson-php/releases)

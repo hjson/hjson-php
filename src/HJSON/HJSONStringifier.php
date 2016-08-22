@@ -8,9 +8,12 @@ function mb_str_split( $string ) {
 
 class HJSONStringifier {
 
+    // needsEscape tests if the string can be written without escapes
     private $needsEscape = '/[\\\"\x00-\x1f\x7f-\x9f\x{00ad}\x{0600}-\x{0604}\x{070f}\x{17b4}\x{17b5}\x{200c}-\x{200f}\x{2028}-\x{202f}\x{2060}-\x{206f}\x{feff}\x{fff0}-\x{ffff}\x]/u';
-    private $needsQuotes = '/[\x00-\x1f\x7f-\x9f\x{00ad}\x{0600}-\x{0604}\x{070f}\x{17b4}\x{17b5}\x{200c}-\x{200f}\x{2028}-\x{202f}\x{2060}-\x{206f}\x{feff}\x{fff0}-\x{ffff}\x]/u'; // like needsEscape but without \\ and \"
-    private $needsEscapeML = '/\'\'\'|[\x00-\x09\x0b\x0c\x0e-\x1f\x7f-\x9f\x{00ad}\x{0600}-\x{0604}\x{070f}\x{17b4}\x{17b5}\x{200c}-\x{200f}\x{2028}-\x{202f}\x{2060}-\x{206f}\x{feff}\x{fff0}-\x{ffff}\x]/u'; // ''' || (needsQuotes but without \n and \r)
+    // needsQuotes tests if the string can be written as a quoteless string (includes needsEscape but without \\ and \")
+    private $needsQuotes = '/^\\s|^"|^\'\'\'|^#|^\\/\\*|^\\/\\/|^\\{|^\\}|^\\[|^\\]|^:|^,|\\s$|[\x00-\x1f\x7f-\x9f\x{00ad}\x{0600}-\x{0604}\x{070f}\x{17b4}\x{17b5}\x{200c}-\x{200f}\x{2028}-\x{202f}\x{2060}-\x{206f}\x{feff}\x{fff0}-\x{ffff}\x]/u';
+    // needsEscapeML tests if the string can be written as a multiline string (includes needsEscape but without \n, \r, \\ and \")
+    private $needsEscapeML = '/\'\'\'|[\x00-\x09\x0b\x0c\x0e-\x1f\x7f-\x9f\x{00ad}\x{0600}-\x{0604}\x{070f}\x{17b4}\x{17b5}\x{200c}-\x{200f}\x{2028}-\x{202f}\x{2060}-\x{206f}\x{feff}\x{fff0}-\x{ffff}\x]/u';
     private $startsWithKeyword = '/^(true|false|null)\s*((,|\]|\}|#|\/\/|\/\*).*)?$/';
     private $needsEscapeName = '/[,\{\[\}\]\s:#"]|\/\/|\/\*|\'\'\'/';
     private $gap = '';
@@ -103,20 +106,10 @@ class HJSONStringifier {
     {
         if (!$string) return '""';
 
-        $doEscape = $this->quoteAlways || $hasComment || preg_match($this->needsQuotes, $string);
-
         // Check if we can insert this string without quotes
         // see hjson syntax (must not parse as true, false, null or number)
-        $first = $string[0]; $last = $string[mb_strlen($string)-1];
-        if ($doEscape ||
-            $this->isWhite($first) ||
-            $first === '"' ||
-            $first === "'" && $string[1] === "'" && $string[2] === "'" ||
-            $first === '#' ||
-            $first === '/' && ($string[1] === '*' || $string[1] === '/') ||
-            $first === '{' ||
-            $first === '[' ||
-            $this->isWhite($last) ||
+        if ($this->quoteAlways || $hasComment ||
+            preg_match($this->needsQuotes, $string) ||
             HJSONUtils::tryParseNumber($string, true) !== null ||
             preg_match($this->startsWithKeyword, $string)) {
 
