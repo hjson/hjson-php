@@ -350,7 +350,7 @@ class HJSONParser {
         // returns string, true, false, or null.
 
         if ($this->isPunctuatorChar($this->ch))
-          $this->error("Found a punctuator character '{$this->ch}' when excpecting a quoteless string (check your syntax)");
+          $this->error("Found a punctuator character '{$this->ch}' when expecting a quoteless string (check your syntax)");
 
         $value = $this->ch;
         while (true) {
