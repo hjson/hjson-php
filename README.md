@@ -31,7 +31,7 @@ The PHP implementation of Hjson is based on [hjson-js](https://github.com/hjson/
 # Install from composer
 
 ```
-composer require HJSON/HJSON
+composer require laktak/hjson
 ```
 
 # Usage
