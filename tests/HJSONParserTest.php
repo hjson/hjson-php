@@ -7,13 +7,10 @@ use HJSON\HJSONException;
 
 class HJSONParserTest extends PHPUnit_Framework_TestCase {
 
-
     public function setUp()
     {
         parent::setUp();
         $this->rootDir = dirname(__FILE__).DIRECTORY_SEPARATOR."assets";
-        $this->parser = new HJSONParser();
-        $this->stringifier = new HJSONStringifier();
     }
 
     private function load($file, $cr)
@@ -30,11 +27,16 @@ class HJSONParserTest extends PHPUnit_Framework_TestCase {
         $shouldFail = substr($name, 0, 4) === "fail";
 
         try {
-            $data = $this->parser->parse($text);
+            $parser = new HJSONParser();
+            $data = $parser->parse($text);
+
+			$arrayData = $parser->parse($text, ['assoc' => true]);
+            $this->assertEquals($arrayData, json_decode(json_encode($data), true));
 
             if (!$shouldFail) {
                 $text1 = json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
-                $hjson1 = $this->stringifier->stringify($data, [
+                $stringifier = new HJSONStringifier();
+                $hjson1 = $stringifier->stringify($data, [
                     'eol' => $outputCr ? "\r\n" : "\n",
                     'emitRootBraces' => true,
                     'space' => 2

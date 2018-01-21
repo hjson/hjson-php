@@ -25,9 +25,15 @@ class HJSONParser {
 
     public function parse($source, $options=[])
     {
-        $this->keepWsc = $options && $options['keepWsc'];
+        $this->keepWsc = $options && isset($options['keepWsc']) && $options['keepWsc'];
         $this->text = $source;
-        return $this->rootValue();
+        $data = $this->rootValue();
+
+        if ($options && isset($options['assoc']) && $options['assoc']) {
+            $data = json_decode(json_encode($data), true);
+        }
+
+        return $data;
     }
 
     private function resetAt()
