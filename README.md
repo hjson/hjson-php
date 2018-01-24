@@ -57,6 +57,7 @@ This method parses *JSON* or *Hjson* text to produce an object or array.
 - *text*: the string to parse as JSON or Hjson
 - *options*: array
   - *keepWsc*: boolean, keep white space and comments. This is useful if you want to edit an hjson file and save it while preserving comments (default false)
+  - *assoc*: boolean, return associative array instead of object (default false)
 
 ### HJSONStringifier: stringify($value, $options)
 
