@@ -1,11 +1,14 @@
 <?php
 
+namespace HJSON\Tests;
+
 use HJSON\HJSONParser;
 use HJSON\HJSONStringifier;
 use HJSON\HJSONException;
+use PHPUnit\Framework\TestCase;
 
 
-class HJSONParserTest extends PHPUnit_Framework_TestCase {
+class HJSONParserTest extends TestCase {
 
     public function setUp()
     {
@@ -53,7 +56,7 @@ class HJSONParserTest extends PHPUnit_Framework_TestCase {
                     $this->assertEquals($json1, $json2);
                 }
             }
-            else $this->assertTrue(false);
+            else $this->assertFalse(false);
         }
         catch (HJSONException $e) {
             if (!$shouldFail) throw $e;

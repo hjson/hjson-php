@@ -201,7 +201,9 @@ class HJSONParser {
             $this->white();
             $this->next(':');
             // duplicate keys overwrite the previous value
-            $object->$key = $this->value();
+            if ($key !== '') {
+                $object->$key = $this->value();
+            }
             $wat = $this->at;
             $this->white();
             // in Hjson the comma is optional and trailing commas are allowed
@@ -331,7 +333,7 @@ class HJSONParser {
 
         while (true) {
             if ($this->ch === ':') {
-                if (!$name) $this->error("Found ':' but no key name (for an empty key name use quotes)");
+                if (!$name && $name != 0) $this->error("Found ':' but no key name (for an empty key name use quotes)");
                 else if ($space >=0 && $space !== mb_strlen($name)) {
                     $this->at = $start + $space;
                     $this->error("Found whitespace in your key name (use quotes to include)");
