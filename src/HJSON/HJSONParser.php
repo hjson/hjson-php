@@ -333,7 +333,7 @@ class HJSONParser {
 
         while (true) {
             if ($this->ch === ':') {
-                if (!$name && $name != 0) $this->error("Found ':' but no key name (for an empty key name use quotes)");
+                if ($name === '') $this->error("Found ':' but no key name (for an empty key name use quotes)");
                 else if ($space >=0 && $space !== mb_strlen($name)) {
                     $this->at = $start + $space;
                     $this->error("Found whitespace in your key name (use quotes to include)");

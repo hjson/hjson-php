@@ -56,7 +56,6 @@ class HJSONParserTest extends TestCase {
                     $this->assertEquals($json1, $json2);
                 }
             }
-            else $this->assertFalse(false);
         }
         catch (HJSONException $e) {
             if (!$shouldFail) throw $e;
