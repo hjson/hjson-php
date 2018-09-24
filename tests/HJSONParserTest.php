@@ -55,6 +55,8 @@ class HJSONParserTest extends TestCase {
                     $json2 = json_encode(json_decode($text));
                     $this->assertEquals($json1, $json2);
                 }
+            } else {
+                $this->markTestIncomplete('This runEach test has not been implemented yet.');
             }
         }
         catch (HJSONException $e) {
