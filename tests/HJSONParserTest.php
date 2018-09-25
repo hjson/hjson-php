@@ -7,8 +7,8 @@ use HJSON\HJSONStringifier;
 use HJSON\HJSONException;
 use PHPUnit\Framework\TestCase;
 
-
-class HJSONParserTest extends TestCase {
+class HJSONParserTest extends TestCase
+{
 
     public function setUp()
     {
@@ -33,7 +33,7 @@ class HJSONParserTest extends TestCase {
             $parser = new HJSONParser();
             $data = $parser->parse($text);
 
-			$arrayData = $parser->parse($text, ['assoc' => true]);
+            $arrayData = $parser->parse($text, ['assoc' => true]);
             $this->assertEquals($arrayData, json_decode(json_encode($data), true));
 
             if (!$shouldFail) {
@@ -58,9 +58,10 @@ class HJSONParserTest extends TestCase {
             } else {
                 $this->markTestIncomplete('This test succeeded on data that should fail.');
             }
-        }
-        catch (HJSONException $e) {
-            if (!$shouldFail) throw $e;
+        } catch (HJSONException $e) {
+            if (!$shouldFail) {
+                throw $e;
+            }
         }
     }
 
@@ -69,12 +70,16 @@ class HJSONParserTest extends TestCase {
         $files = array_diff(scandir($this->rootDir), ['..', '.']);
         foreach ($files as $file) {
             $name = explode('_test.', $file);
-            if (count($name) < 2) continue;
+            if (count($name) < 2) {
+                continue;
+            }
             $isJson = $name[1] === "json";
             $name = $name[0];
 
             // skip empty test, empty keys are not supported by PHP
-            if ($name === "empty") continue;
+            if ($name === "empty") {
+                continue;
+            }
 
             $this->runEach($name, $file, $isJson, false, false);
             $this->runEach($name, $file, $isJson, false, true);

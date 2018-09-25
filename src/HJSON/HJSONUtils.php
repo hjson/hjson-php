@@ -2,12 +2,16 @@
 
 namespace HJSON;
 
-class HJSONUtils {
+class HJSONUtils
+{
 
-    public static function tryParseNumber($text, $stopAtNext=null)
+    public static function tryParseNumber($text, $stopAtNext = null)
     {
         // Parse a number value.
-        $number = null; $string = ''; $leadingZeros = 0; $testLeading = true;
+        $number = null;
+        $string = '';
+        $leadingZeros = 0;
+        $testLeading = true;
         $at = 0;
         $ch = null;
         
@@ -26,17 +30,23 @@ class HJSONUtils {
 
         while ($ch !== null && $ch >= '0' && $ch <= '9') {
             if ($testLeading) {
-                if ($ch == '0') $leadingZeros++;
-                else $testLeading = false;
+                if ($ch == '0') {
+                    $leadingZeros++;
+                } else {
+                    $testLeading = false;
+                }
             }
             $string .= $ch;
             $next();
         }
-        if ($testLeading) $leadingZeros--; // single 0 is allowed
+        if ($testLeading) {
+            $leadingZeros--; // single 0 is allowed
+        }
         if ($ch === '.') {
             $string .= '.';
-            while ($next() !== null && $ch >= '0' && $ch <= '9')
+            while ($next() !== null && $ch >= '0' && $ch <= '9') {
                 $string .= $ch;
+            }
         }
         if ($ch === 'e' || $ch === 'E') {
             $string .= $ch;
@@ -52,22 +62,27 @@ class HJSONUtils {
         }
 
         // skip white/to (newline)
-        while ($ch !== null && $ch <= ' ') $next();
+        while ($ch !== null && $ch <= ' ') {
+            $next();
+        }
 
         if ($stopAtNext) {
             // end scan if we find a control character like ,}] or a comment
             if ($ch === ',' || $ch === '}' || $ch === ']' ||
-                $ch === '#' || $ch === '/' && ($text[$at] === '/' || $text[$at] === '*')) $ch = null;
+                $ch === '#' || $ch === '/' && ($text[$at] === '/' || $text[$at] === '*')) {
+                $ch = null;
+            }
         }
 
         $number = $string;
-        if (is_numeric($string)) $number = 0+$string;
+        if (is_numeric($string)) {
+            $number = 0+$string;
+        }
 
 
         if ($ch !== null || $leadingZeros || !is_numeric($number)) {
             return null;
-        }
-        else {
+        } else {
             return $number;
         }
     }

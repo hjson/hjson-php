@@ -2,11 +2,13 @@
 
 namespace HJSON;
 
-function mb_str_split( $string ) {
-    return preg_split('/(?<!^)(?!$)/u', $string );
+function mb_str_split($string)
+{
+    return preg_split('/(?<!^)(?!$)/u', $string);
 }
 
-class HJSONStringifier {
+class HJSONStringifier
+{
 
     // needsEscape tests if the string can be written without escapes
     private $needsEscape = '/[\\\"\x00-\x1f\x7f-\x9f\x{00ad}\x{0600}-\x{0604}\x{070f}\x{17b4}\x{17b5}\x{200c}-\x{200f}\x{2028}-\x{202f}\x{2060}-\x{206f}\x{feff}\x{fff0}-\x{ffff}\x]/u';
@@ -29,7 +31,8 @@ class HJSONStringifier {
 
     private $defaultBracesSameLine = false;
 
-    function __construct() {
+    public function __construct()
+    {
         $this->meta = [
             "\t" => "\\t",
             "\n" => "\\n",
@@ -42,7 +45,7 @@ class HJSONStringifier {
     }
 
 
-    public function stringify($value, $opt=[])
+    public function stringify($value, $opt = [])
     {
         $this->eol = PHP_EOL;
         $this->indent = '  ';
@@ -54,7 +57,9 @@ class HJSONStringifier {
         $space = null;
 
         if ($opt && is_array($opt)) {
-            if (@$opt['eol'] === "\n" || @$opt['eol'] === "\r\n") $this->eol = $opt['eol'];
+            if (@$opt['eol'] === "\n" || @$opt['eol'] === "\r\n") {
+                $this->eol = $opt['eol'];
+            }
             $space = @$opt['space'];
             $this->keepWsc = @$opt['keepWsc'];
             $this->bracesSameLine = @$opt['bracesSameLine'] || $this->defaultBracesSameLine;
@@ -67,15 +72,19 @@ class HJSONStringifier {
         // many spaces. If it is a string, it will be used as the indent string.
         if (is_int($space)) {
             $this->indent = '';
-            for ($i = 0; $i < $space; $i++) $this->indent .= ' ';
+            for ($i = 0; $i < $space;
+            $i++) {
+                $this->indent .= ' ';
+            }
+        } elseif (is_string($space)) {
+            $this->indent = $space;
         }
-        else if (is_string($space)) $this->indent = $space;
 
         // Return the result of stringifying the value.
         return $this->str($value, null, true, true);
     }
 
-    public function stringifyWsc($value, $opt=[])
+    public function stringifyWsc($value, $opt = [])
     {
         return $this->stringify($value, array_merge($opt, ['keepWsc' => true]));
     }
@@ -94,17 +103,24 @@ class HJSONStringifier {
             if (preg_match($this->needsEscape, $char)) {
                 $a = $char;
                 $c = @$this->meta[$a] ?: null;
-                if (gettype($c) === 'string') return $c;
-                else return $char;
-            } else return $char;
+                if (gettype($c) === 'string') {
+                    return $c;
+                } else {
+                    return $char;
+                }
+            } else {
+                return $char;
+            }
         }, $chars);
 
         return implode('', $chars);
     }
 
-    private function quote($string=null, $gap=null, $hasComment=null, $isRootObject=null)
+    private function quote($string = null, $gap = null, $hasComment = null, $isRootObject = null)
     {
-        if (!$string) return '""';
+        if (!$string) {
+            return '""';
+        }
 
         // Check if we can insert this string without quotes
         // see hjson syntax (must not parse as true, false, null or number)
@@ -112,7 +128,6 @@ class HJSONStringifier {
             preg_match($this->needsQuotes, $string) ||
             HJSONUtils::tryParseNumber($string, true) !== null ||
             preg_match($this->startsWithKeyword, $string)) {
-
             // If the string contains no control characters, no quote characters, and no
             // backslash characters, then we can safely slap some quotes around it.
             // Otherwise we first check if the string can be expressed in multiline
@@ -121,17 +136,12 @@ class HJSONStringifier {
 
             if (!preg_match($this->needsEscape, $string)) {
                 return '"' . $string . '"';
-            }
-
-            else if (!preg_match($this->needsEscapeML, $string) && !$isRootObject) {
+            } elseif (!preg_match($this->needsEscapeML, $string) && !$isRootObject) {
                 return $this->mlString($string, $gap);
-            }
-
-            else {
+            } else {
                 return '"' . $this->quoteReplace($string) . '"';
             }
-        }
-        else {
+        } else {
             // return without quotes
             return $string;
         }
@@ -153,7 +163,9 @@ class HJSONStringifier {
             $res = $this->eol . $gap . "'''";
             for ($i = 0; $i < count($a); $i++) {
                 $res .= $this->eol;
-                if ($a[$i]) $res .= $gap . $a[$i];
+                if ($a[$i]) {
+                    $res .= $gap . $a[$i];
+                }
             }
             return $res . $this->eol . $gap . "'''";
         }
@@ -161,7 +173,9 @@ class HJSONStringifier {
 
     private function quoteName($name)
     {
-        if (!$name) return '""';
+        if (!$name) {
+            return '""';
+        }
 
         // Check if we can insert this name without quotes
         if (preg_match($this->needsEscapeName, $name)) {
@@ -172,20 +186,30 @@ class HJSONStringifier {
         }
     }
 
-    private function str($value, $hasComment=null, $noIndent=null, $isRootObject=null)
+    private function str($value, $hasComment = null, $noIndent = null, $isRootObject = null)
     {
         // Produce a string from value.
 
-        $startsWithNL = function ($str) { return $str && $str[$str[0] === "\r" ? 1 : 0] === "\n"; };
-        $testWsc = function ($str) use ($startsWithNL) { return $str && !$startsWithNL($str); };
+        $startsWithNL = function ($str) {
+            return $str && $str[$str[0] === "\r" ? 1 : 0] === "\n";
+        };
+        $testWsc = function ($str) use ($startsWithNL) {
+            return $str && !$startsWithNL($str);
+        };
         $wsc = function ($str) {
-            if (!$str) return "";
+            if (!$str) {
+                return "";
+            }
             for ($i = 0; $i < mb_strlen($str); $i++) {
                 $c = $str[$i];
                 if ($c === "\n" ||
                     $c === '#' ||
-                    $c === '/' && ($str[$i+1] === '/' || $str[$i+1] === '*')) break;
-                if ($c > ' ') return ' # ' . $str;
+                    $c === '/' && ($str[$i+1] === '/' || $str[$i+1] === '*')) {
+                    break;
+                }
+                if ($c > ' ') {
+                    return ' # ' . $str;
+                }
             }
             return $str;
         };
@@ -208,49 +232,63 @@ class HJSONStringifier {
 
             case 'object':
             case 'array':
-
                 $isArray = is_array($value);
 
-                $kw = null; $kwl = null; // whitespace & comments
+                $kw = null;
+                $kwl = null; // whitespace & comments
                 if ($this->keepWsc) {
-                    if ($isArray) $kw = @$value['__WSC__'];
-                    else $kw = @$value->__WSC__;
+                    if ($isArray) {
+                        $kw = @$value['__WSC__'];
+                    } else {
+                        $kw = @$value->__WSC__;
+                    }
                 }
 
                 $showBraces = $isArray || !$isRootObject || ($kw ? !@$kw->noRootBraces : $this->emitRootBraces);
 
                 // Make an array to hold the partial results of stringifying this object value.
                 $mind = $this->gap;
-                if ($showBraces) $this->gap .= $this->indent;
+                if ($showBraces) {
+                    $this->gap .= $this->indent;
+                }
                 $eolMind = $this->eol . $mind;
                 $eolGap = $this->eol . $this->gap;
                 $prefix = $noIndent || $this->bracesSameLine ? '' : $eolMind;
                 $partial = [];
 
-                $k; $v; // key, value
+                $k;
+                $v; // key, value
 
                 if ($isArray) {
                     // The value is an array. Stringify every element. Use null as a placeholder
                     // for non-JSON values.
 
                     $length = count($value);
-                    if (array_key_exists('__WSC__', $value)) $length--;
+                    if (array_key_exists('__WSC__', $value)) {
+                        $length--;
+                    }
 
                     for ($i = 0; $i < $length; $i++) {
-                        if ($kw) $partial[] = $wsc(@$kw[$i]) . $eolGap;
+                        if ($kw) {
+                            $partial[] = $wsc(@$kw[$i]) . $eolGap;
+                        }
                         $str = $this->str($value[$i], $kw ? $testWsc(@$kw[$i+1]) : false, true);
                         $partial[] = $str !== null ? $str : 'null';
                     }
-                    if ($kw) $partial[] = $wsc(@$kw[$i]) . $eolMind;
+                    if ($kw) {
+                        $partial[] = $wsc(@$kw[$i]) . $eolMind;
+                    }
 
                     // Join all of the elements together, separated with newline, and wrap them in
                     // brackets.
-                    if ($kw) $v = $prefix . '[' . implode('', $partial) . ']';
-                    else if (count($partial) === 0) $v = '[]';
-                    else $v = $prefix . '[' . $eolGap . implode($eolGap, $partial) . $eolMind . ']';
-                }
-
-                else {
+                    if ($kw) {
+                        $v = $prefix . '[' . implode('', $partial) . ']';
+                    } elseif (count($partial) === 0) {
+                        $v = '[]';
+                    } else {
+                        $v = $prefix . '[' . $eolGap . implode($eolGap, $partial) . $eolMind . ']';
+                    }
+                } else {
                     // Otherwise, iterate through all of the keys in the object.
 
                     if ($kw) {
@@ -264,29 +302,43 @@ class HJSONStringifier {
 
                         for ($i = 0, $length = count($keys); $i < $length; $i++) {
                             $k = $keys[$i];
-                            if ($k === '__WSC__') continue;
-                            if ($showBraces || $i>0 || $kwl) $partial[] = $kwl . $eolGap;
+                            if ($k === '__WSC__') {
+                                continue;
+                            }
+                            if ($showBraces || $i>0 || $kwl) {
+                                $partial[] = $kwl . $eolGap;
+                            }
                             $kwl = $wsc($kw->c->$k);
                             $v = $this->str($value->$k, $testWsc($kwl));
-                            if ($v !== null) $partial[] = $this->quoteName($k) . ($startsWithNL($v) ? ':' : ': ') . $v;
+                            if ($v !== null) {
+                                $partial[] = $this->quoteName($k) . ($startsWithNL($v) ? ':' : ': ') . $v;
+                            }
                         }
-                        if ($showBraces || $kwl) $partial[] = $kwl . $eolMind;
-                    }
-                    else {
+                        if ($showBraces || $kwl) {
+                            $partial[] = $kwl . $eolMind;
+                        }
+                    } else {
                         foreach ($value as $k => $vvv) {
                             $v = $this->str($value->$k);
-                            if ($v !== null) $partial[] = $this->quoteName($k) . ($startsWithNL($v) ? ':' : ': ') . $v;
+                            if ($v !== null) {
+                                $partial[] = $this->quoteName($k) . ($startsWithNL($v) ? ':' : ': ') . $v;
+                            }
                         }
                     }
 
                     // Join all of the member texts together, separated with newlines
-                    if (count($partial) === 0) $v = '{}';
-                    else if ($showBraces) {
+                    if (count($partial) === 0) {
+                        $v = '{}';
+                    } elseif ($showBraces) {
                         // and wrap them in braces
-                        if ($kw) $v = $prefix . '{' . implode('', $partial) . '}';
-                        else $v = $prefix . '{' . $eolGap . implode($eolGap, $partial) . $eolMind . '}';
+                        if ($kw) {
+                            $v = $prefix . '{' . implode('', $partial) . '}';
+                        } else {
+                            $v = $prefix . '{' . $eolGap . implode($eolGap, $partial) . $eolMind . '}';
+                        }
+                    } else {
+                        $v = implode($kw ? '' : $eolGap, $partial);
                     }
-                    else $v = implode($kw ? '' : $eolGap, $partial);
                 }
 
                 $this->gap = $mind;
