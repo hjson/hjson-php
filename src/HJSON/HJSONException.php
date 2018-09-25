@@ -2,4 +2,6 @@
 
 namespace HJSON;
 
-class HJSONException extends \Exception {}
+class HJSONException extends \Exception
+{
+}
