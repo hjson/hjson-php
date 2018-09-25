@@ -58,9 +58,10 @@ class HJSONParserTest extends TestCase
             } else {
                 $this->markTestIncomplete('This test succeeded on data that should fail.');
             }
-        }
-        catch (HJSONException $e) {
-            if (!$shouldFail) throw $e;
+        } catch (HJSONException $e) {
+            if (!$shouldFail) {
+                throw $e;
+            }
         }
     }
 
