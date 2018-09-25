@@ -56,12 +56,11 @@ class HJSONParserTest extends TestCase
                     $this->assertEquals($json1, $json2);
                 }
             } else {
-                $this->assertFalse(false);
+                $this->markTestIncomplete('This test succeeded on data that should fail.');
             }
-        } catch (HJSONException $e) {
-            if (!$shouldFail) {
-                throw $e;
-            }
+        }
+        catch (HJSONException $e) {
+            if (!$shouldFail) throw $e;
         }
     }
 
