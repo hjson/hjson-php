@@ -10,3 +10,4 @@ sudo: false
 before_script:
     - travis_retry composer self-update
     - travis_retry composer install --no-interaction --prefer-dist
+    - ./vendor/bin/phpcs -n --standard=PSR2 src/ tests/
