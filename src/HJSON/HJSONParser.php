@@ -105,6 +105,7 @@ class HJSONParser
                 if ($this->peek(0) !== '\'' || $this->peek(1) !== '\'') {
                     return $this->string('\'');
                 }
+                // Falls through on multiline strings
             default:
                 return $this->tfnns();
         }

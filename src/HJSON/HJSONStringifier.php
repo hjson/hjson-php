@@ -19,8 +19,7 @@ class HJSONStringifier
     // needsQuotes tests if the string can be written as a quoteless string (includes needsEscape but without \\ and \")
     private $needsQuotes = '/^\\s|^"|^\'|^\'\'\'|^#|^\\/\\*|^\\/\\/|^\\{|^\\}|^\\[|^\\]|^:|^,|\\s$|[\x00-\x1f\x7f-\x9f\x{00ad}\x{0600}-\x{0604}\x{070f}\x{17b4}\x{17b5}\x{200c}-\x{200f}\x{2028}-\x{202f}\x{2060}-\x{206f}\x{feff}\x{fff0}-\x{ffff}\x]/u';
     // needsEscapeML tests if the string can be written as a multiline string (includes needsEscape but without \n, \r, \\ and \")
-    private $needsEscapeML = '/\'\'\'|[\x00-\x08\x0b\x0c\x0e-\x1f\x7f-\x9f\x{00ad}\x{0600}-\x{0604}\x{070f}\x{17b4}\x{17b5}\x{200c}-\x{200f}\x{2028}-\x{202f}\x{2060}-\x{206f}\x{feff}\x{fff0}-\x{ffff}\x]/u';
-    private $onlyWhitespace = '/^\\s+$/';
+    private $needsEscapeML = '/^\\s+$|\'\'\'|[\x00-\x08\x0b\x0c\x0e-\x1f\x7f-\x9f\x{00ad}\x{0600}-\x{0604}\x{070f}\x{17b4}\x{17b5}\x{200c}-\x{200f}\x{2028}-\x{202f}\x{2060}-\x{206f}\x{feff}\x{fff0}-\x{ffff}\x]/u';
     private $startsWithKeyword = '/^(true|false|null)\s*((,|\]|\}|#|\/\/|\/\*).*)?$/';
     private $needsEscapeName = '/[,\{\[\}\]\s:#"\']|\/\/|\/\*|\'\'\'/';
     private $gap = '';
@@ -142,11 +141,7 @@ class HJSONStringifier
 
             if (!preg_match($this->needsEscape, $string)) {
                 return '"' . $string . '"';
-            } elseif (
-                !preg_match($this->needsEscapeML, $string) &&
-                !preg_match($this->onlyWhitespace, $string) &&
-                !$isRootObject
-            ) {
+            } elseif (!preg_match($this->needsEscapeML, $string) && !$isRootObject) {
                 return $this->mlString($string, $gap);
             } else {
                 return '"' . $this->quoteReplace($string) . '"';
