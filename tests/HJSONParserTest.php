@@ -10,7 +10,7 @@ use PHPUnit\Framework\TestCase;
 class HJSONParserTest extends TestCase
 {
 
-    public function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
         $this->rootDir = dirname(__FILE__).DIRECTORY_SEPARATOR."assets";
