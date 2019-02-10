@@ -305,13 +305,10 @@ class HJSONParser
         $col=0;
         $colBytes = 0;
         $line=1;
-        for ($i = $this->at-1; $i > 0 && @$this->text[$i] !== "\n"; $i--, $col++) {
-        }
 
         $i = $this->at;
         while ($i > 0) {
-            $ch = mb_substr(mb_strcut($this->text, $i - 1), 0, 1);
-            $i += strlen($ch);
+            $i -= strlen($ch);
 
             if ($ch === "\n") {
                 break;
