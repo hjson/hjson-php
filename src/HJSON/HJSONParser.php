@@ -326,8 +326,8 @@ class HJSONParser
 
         // Get the next character. When there are no more characters,
         // return the empty string.
-        $this->ch = (mb_strlen($this->text) > $this->at) ? $this->text[$this->at] : null;
-        $this->at++;
+        $this->ch = (strlen($this->text) > $this->at) ? mb_substr(mb_strcut($this->text, $this->at), 0, 1) : null;
+        $this->at = $this->at + strlen($this->ch);
         return $this->ch;
     }
 
