@@ -15,6 +15,7 @@ class HJSONParser
     {
         $this->escapee = [
             '"'  => '"',
+            '\'' => '\'',
             "\\" => "\\",
             '/'  => '/',
             'b'  => chr(8),
@@ -99,13 +100,17 @@ class HJSONParser
             case '[':
                 return $this->_array();
             case '"':
-                return $this->string();
+                return $this->string('"');
+            case '\'':
+                if ($this->peek(0) !== '\'' || $this->peek(1) !== '\'') {
+                    return $this->string('\'');
+                }
             default:
                 return $this->tfnns();
         }
     }
 
-    private function string()
+    private function string($quote)
     {
         // Parse a string value.
         $hex;
@@ -113,9 +118,9 @@ class HJSONParser
         $uffff;
 
         // When parsing for string values, we must look for " and \ characters.
-        if ($this->ch === '"') {
+        if ($this->ch === $quote) {
             while ($this->next() !== null) {
-                if ($this->ch === '"') {
+                if ($this->ch === $quote) {
                     $this->next();
                     return $string;
                 }
@@ -410,7 +415,9 @@ class HJSONParser
         // unless they include {}[],: or whitespace.
 
         if ($this->ch === '"') {
-            return $this->string();
+            return $this->string('"');
+        } else if ($this->ch === '\'') {
+            return $this->string('\'');
         }
 
         $name = "";
