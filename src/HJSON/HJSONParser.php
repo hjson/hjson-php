@@ -308,6 +308,7 @@ class HJSONParser
 
         $i = $this->at;
         while ($i > 0) {
+            $ch = mb_substr(mb_strcut($this->text, $i - 1), 0, 1);
             $i -= strlen($ch);
 
             if ($ch === "\n") {
