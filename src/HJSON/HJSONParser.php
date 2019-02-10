@@ -345,7 +345,11 @@ class HJSONParser
     private function peek($offs)
     {
         // range check is not required
-        return mb_substr(mb_strcut($this->text, $this->at), $offs, 1);
+        if ($offs >= 0) {
+            return mb_substr(mb_strcut($this->text, $this->at), $offs, 1);
+        } else {
+            return mb_substr(mb_strcut($this->text, 0, $this->at), $offs, 1);
+        }
     }
 
     private function skipIndent($indent)
