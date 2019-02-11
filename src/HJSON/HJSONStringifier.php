@@ -2,9 +2,13 @@
 
 namespace HJSON;
 
+/**
+ * NOTE: this may return an empty string at the end of the array when the input
+ * string ends with a newline character
+ */
 function mb_str_split($string)
 {
-    return preg_split('/(?<!^)(?!$)/u', $string);
+    return preg_split('/(?<!^)/u', $string);
 }
 
 class HJSONStringifier
@@ -13,11 +17,11 @@ class HJSONStringifier
     // needsEscape tests if the string can be written without escapes
     private $needsEscape = '/[\\\"\x00-\x1f\x7f-\x9f\x{00ad}\x{0600}-\x{0604}\x{070f}\x{17b4}\x{17b5}\x{200c}-\x{200f}\x{2028}-\x{202f}\x{2060}-\x{206f}\x{feff}\x{fff0}-\x{ffff}\x]/u';
     // needsQuotes tests if the string can be written as a quoteless string (includes needsEscape but without \\ and \")
-    private $needsQuotes = '/^\\s|^"|^\'\'\'|^#|^\\/\\*|^\\/\\/|^\\{|^\\}|^\\[|^\\]|^:|^,|\\s$|[\x00-\x1f\x7f-\x9f\x{00ad}\x{0600}-\x{0604}\x{070f}\x{17b4}\x{17b5}\x{200c}-\x{200f}\x{2028}-\x{202f}\x{2060}-\x{206f}\x{feff}\x{fff0}-\x{ffff}\x]/u';
+    private $needsQuotes = '/^\\s|^"|^\'|^\'\'\'|^#|^\\/\\*|^\\/\\/|^\\{|^\\}|^\\[|^\\]|^:|^,|\\s$|[\x00-\x1f\x7f-\x9f\x{00ad}\x{0600}-\x{0604}\x{070f}\x{17b4}\x{17b5}\x{200c}-\x{200f}\x{2028}-\x{202f}\x{2060}-\x{206f}\x{feff}\x{fff0}-\x{ffff}\x]/u';
     // needsEscapeML tests if the string can be written as a multiline string (includes needsEscape but without \n, \r, \\ and \")
-    private $needsEscapeML = '/\'\'\'|[\x00-\x09\x0b\x0c\x0e-\x1f\x7f-\x9f\x{00ad}\x{0600}-\x{0604}\x{070f}\x{17b4}\x{17b5}\x{200c}-\x{200f}\x{2028}-\x{202f}\x{2060}-\x{206f}\x{feff}\x{fff0}-\x{ffff}\x]/u';
+    private $needsEscapeML = '/^\\s+$|\'\'\'|[\x00-\x08\x0b\x0c\x0e-\x1f\x7f-\x9f\x{00ad}\x{0600}-\x{0604}\x{070f}\x{17b4}\x{17b5}\x{200c}-\x{200f}\x{2028}-\x{202f}\x{2060}-\x{206f}\x{feff}\x{fff0}-\x{ffff}\x]/u';
     private $startsWithKeyword = '/^(true|false|null)\s*((,|\]|\}|#|\/\/|\/\*).*)?$/';
-    private $needsEscapeName = '/[,\{\[\}\]\s:#"]|\/\/|\/\*|\'\'\'/';
+    private $needsEscapeName = '/[,\{\[\}\]\s:#"\']|\/\/|\/\*|\'\'\'/';
     private $gap = '';
     private $indent = '  ';
 
@@ -38,6 +42,7 @@ class HJSONStringifier
             "\n" => "\\n",
             "\r" => "\\r",
             '"'  => '\\"',
+            '\''  => '\\\'',
             '\\' => "\\\\"
         ];
         $this->meta[chr(8)] = '\\b';
