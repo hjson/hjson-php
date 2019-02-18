@@ -308,18 +308,30 @@ class HJSONParser
 
     private function error($m)
     {
-        $i=0;
         $col=0;
+        $colBytes = 0;
         $line=1;
-        for ($i = $this->at-1; $i > 0 && @$this->text[$i] !== "\n"; $i--, $col++) {
+
+        $i = $this->at;
+        while ($i > 0) {
+            $ch = mb_substr(mb_strcut($this->text, $i - 1), 0, 1);
+            $i -= strlen($ch);
+
+            if ($ch === "\n") {
+                break;
+            }
+
+            $col++;
+            $colBytes += strlen($ch);
         }
+
         for (; $i > 0;
         $i--) {
             if ($this->text[$i] === "\n") {
                 $line++;
             }
         }
-        throw new HJSONException("$m at line $line, $col >>>". mb_substr($this->text, $this->at - $col, 20) ." ...");
+        throw new HJSONException("$m at line $line, $col >>>". mb_substr(mb_strcut($this->text, $this->at - $colBytes), 0, 20) ." ...");
     }
 
     private function next($c = false)
@@ -332,15 +344,19 @@ class HJSONParser
 
         // Get the next character. When there are no more characters,
         // return the empty string.
-        $this->ch = (mb_strlen($this->text) > $this->at) ? $this->text[$this->at] : null;
-        $this->at++;
+        $this->ch = (strlen($this->text) > $this->at) ? mb_substr(mb_strcut($this->text, $this->at), 0, 1) : null;
+        $this->at += strlen($this->ch);
         return $this->ch;
     }
 
     private function peek($offs)
     {
         // range check is not required
-        return $this->text[$this->at + $offs];
+        if ($offs >= 0) {
+            return mb_substr(mb_strcut($this->text, $this->at), $offs, 1);
+        } else {
+            return mb_substr(mb_strcut($this->text, 0, $this->at), $offs, 1);
+        }
     }
 
     private function skipIndent($indent)
