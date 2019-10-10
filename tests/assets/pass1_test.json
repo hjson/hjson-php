@@ -3,6 +3,14 @@
     {"object with 1 member":["array with 1 element"]},
     {},
     [],
+    {
+        "1": "foo",
+        "3": "bar"
+    },
+    {
+        "foo": "foo",
+        "bar": "bar"
+    },
     -42,
     true,
     false,

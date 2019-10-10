@@ -8,6 +8,14 @@
   }
   {}
   []
+  {
+    1: foo
+    3: bar
+  }
+  {
+    foo: foo
+    bar: bar
+  }
   -42
   true
   false
