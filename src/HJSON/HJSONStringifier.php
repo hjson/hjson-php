@@ -77,8 +77,7 @@ class HJSONStringifier
         // many spaces. If it is a string, it will be used as the indent string.
         if (is_int($space)) {
             $this->indent = '';
-            for ($i = 0; $i < $space;
-            $i++) {
+            for ($i = 0; $i < $space; $i++) {
                 $this->indent .= ' ';
             }
         } elseif (is_string($space)) {

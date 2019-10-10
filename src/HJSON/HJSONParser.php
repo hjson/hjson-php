@@ -325,8 +325,7 @@ class HJSONParser
             $colBytes += strlen($ch);
         }
 
-        for (; $i > 0;
-        $i--) {
+        for (; $i > 0; $i--) {
             if ($this->text[$i] === "\n") {
                 $line++;
             }
@@ -526,8 +525,7 @@ class HJSONParser
         $i;
         $wat--;
         // remove trailing whitespace
-        for ($i = $this->at - 2; $i > $wat && $this->text[$i] <= ' ' && $this->text[$i] !== "\n";
-        $i--) {
+        for ($i = $this->at - 2; $i > $wat && $this->text[$i] <= ' ' && $this->text[$i] !== "\n"; $i--) {
         }
 
         // but only up to EOL
