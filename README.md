@@ -3,9 +3,9 @@
 [![Build Status](https://img.shields.io/travis/hjson/hjson-php.svg?style=flat-square)](http://travis-ci.org/hjson/hjson-php)
 [![Packagist](https://img.shields.io/packagist/v/laktak/hjson.svg?style=flat-square)](https://packagist.org/packages/laktak/hjson)
 
-[Hjson](http://hjson.org), the Human JSON. A configuration file format for humans. Relaxed syntax, fewer mistakes, more comments.
+[Hjson](https://hjson.github.io), the Human JSON. A configuration file format for humans. Relaxed syntax, fewer mistakes, more comments.
 
-![Hjson Intro](http://hjson.org/hjson1.gif)
+![Hjson Intro](https://hjson.github.io/hjson1.gif)
 
 ```
 {
@@ -26,7 +26,7 @@
 }
 ```
 
-The PHP implementation of Hjson is based on [hjson-js](https://github.com/hjson/hjson-js). For other platforms see [hjson.org](http://hjson.org).
+The PHP implementation of Hjson is based on [hjson-js](https://github.com/hjson/hjson-js). For other platforms see [hjson.github.io](https://hjson.github.io).
 
 # Install from composer
 
