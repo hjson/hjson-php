@@ -77,8 +77,7 @@ class HJSONStringifier
         // many spaces. If it is a string, it will be used as the indent string.
         if (is_int($space)) {
             $this->indent = '';
-            for ($i = 0; $i < $space;
-            $i++) {
+            for ($i = 0; $i < $space; $i++) {
                 $this->indent .= ' ';
             }
         } elseif (is_string($space)) {
@@ -239,6 +238,17 @@ class HJSONStringifier
             case 'array':
                 $isArray = is_array($value);
 
+                $isAssocArray = function (array $arr) {
+                    if (array() === $arr) {
+                        return false;
+                    }
+                    return array_keys($arr) !== range(0, count($arr) - 1);
+                };
+                if ($isArray && $isAssocArray($value)) {
+                    $value = (object) $value;
+                    $isArray = false;
+                }
+
                 $kw = null;
                 $kwl = null; // whitespace & comments
                 if ($this->keepWsc) {
@@ -324,7 +334,7 @@ class HJSONStringifier
                         }
                     } else {
                         foreach ($value as $k => $vvv) {
-                            $v = $this->str($value->$k);
+                            $v = $this->str($vvv);
                             if ($v !== null) {
                                 $partial[] = $this->quoteName($k) . ($startsWithNL($v) ? ':' : ': ') . $v;
                             }
