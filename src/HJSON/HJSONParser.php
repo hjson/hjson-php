@@ -5,7 +5,8 @@ namespace HJSON;
 class HJSONParser
 {
 
-    private $text;
+    private $text_array;
+    private $text_length_chars;
     private $at;   // The index of the current character
     private $ch;   // The current character
     private $escapee = [];
@@ -29,7 +30,9 @@ class HJSONParser
     public function parse($source, $options = [])
     {
         $this->keepWsc = $options && isset($options['keepWsc']) && $options['keepWsc'];
-        $this->text = $source;
+        $this->text_array = preg_split("//u", $source, null, PREG_SPLIT_NO_EMPTY);
+        $this->text_length_chars = count($this->text_array);
+
         $data = $this->rootValue();
 
         if ($options && isset($options['assoc']) && $options['assoc']) {
@@ -312,25 +315,37 @@ class HJSONParser
         $colBytes = 0;
         $line=1;
 
+        // Start with where we're at now, count back to most recent line break
+        // - to determine "column" of error hit
         $i = $this->at;
         while ($i > 0) {
-            $ch = mb_substr(mb_strcut($this->text, $i - 1), 0, 1);
-            $i -= strlen($ch);
 
+            // Mimic old behavior with mb_substr
+            if ($i >= $this->text_length_chars)
+            {
+                $ch = "";
+            }
+            else
+            {
+                $ch = $this->text_array[$i];
+            }
+
+            --$i;
             if ($ch === "\n") {
                 break;
             }
 
             $col++;
-            $colBytes += strlen($ch);
         }
 
+        // Count back line endings from there to determine line# of error hit
         for (; $i > 0; $i--) {
-            if ($this->text[$i] === "\n") {
+            if ($this->text_array[$i] === "\n") {
                 $line++;
             }
         }
-        throw new HJSONException("$m at line $line, $col >>>". mb_substr(mb_strcut($this->text, $this->at - $colBytes), 0, 20) ." ...");
+
+        throw new HJSONException("$m at line $line, $col >>>". implode(array_slice($this->text_array, $this->at - $col, 20)) ." ...");
     }
 
     private function next($c = false)
@@ -343,19 +358,25 @@ class HJSONParser
 
         // Get the next character. When there are no more characters,
         // return the empty string.
-        $this->ch = (strlen($this->text) > $this->at) ? mb_substr(mb_strcut($this->text, $this->at), 0, 1) : null;
-        $this->at += strlen($this->ch);
+        $this->ch = ($this->text_length_chars > $this->at) ? $this->text_array[$this->at] : null;
+        ++$this->at;
         return $this->ch;
     }
 
+    /**
+     * Peek at character at given offset from current "at"
+     *  - >=0 - ahead of "at"
+     *  - <0 = before "at"
+     */
     private function peek($offs)
     {
-        // range check is not required
-        if ($offs >= 0) {
-            return mb_substr(mb_strcut($this->text, $this->at), $offs, 1);
-        } else {
-            return mb_substr(mb_strcut($this->text, 0, $this->at), $offs, 1);
-        }
+        $index = $this->at + $offs;
+
+        // Mimic old behavior with mb_substr
+        if ($index < 0) $index = 0;
+        if ($index >= $this->text_length_chars) return "";
+
+        return $this->text_array[$index];
     }
 
     private function skipIndent($indent)
@@ -525,19 +546,20 @@ class HJSONParser
         $i;
         $wat--;
         // remove trailing whitespace
-        for ($i = $this->at - 2; $i > $wat && $this->text[$i] <= ' ' && $this->text[$i] !== "\n"; $i--) {
+        for ($i = $this->at - 2; $i > $wat && $this->text_array[$i] <= ' ' && $this->text_array[$i] !== "\n"; $i--) {
         }
 
         // but only up to EOL
-        if ($this->text[$i] === "\n") {
+        if ($this->text_array[$i] === "\n") {
             $i--;
         }
-        if ($this->text[$i] === "\r") {
+        if ($this->text_array[$i] === "\r") {
             $i--;
         }
 
-        $res = mb_substr($this->text, $wat, $i-$wat+1);
-        for ($i = 0; $i < mb_strlen($res); $i++) {
+        $res = array_slice($this->text_array, $wat, $i-$wat+1);
+        $res_len = count($res);
+        for ($i = 0; $i < $res_len; $i++) {
             if ($res[$i] > ' ') {
                 return $res;
             }
