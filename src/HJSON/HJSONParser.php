@@ -5,8 +5,8 @@ namespace HJSON;
 class HJSONParser
 {
 
-    private $text_array;
-    private $text_length_chars;
+    private $textArray;
+    private $textLengthChars;
     private $at;   // The index of the current character
     private $ch;   // The current character
     private $escapee = [];
@@ -30,8 +30,8 @@ class HJSONParser
     public function parse($source, $options = [])
     {
         $this->keepWsc = $options && isset($options['keepWsc']) && $options['keepWsc'];
-        $this->text_array = preg_split("//u", $source, null, PREG_SPLIT_NO_EMPTY);
-        $this->text_length_chars = count($this->text_array);
+        $this->textArray = preg_split("//u", $source, null, PREG_SPLIT_NO_EMPTY);
+        $this->textLengthChars = count($this->textArray);
 
         $data = $this->rootValue();
 
@@ -319,15 +319,11 @@ class HJSONParser
         // - to determine "column" of error hit
         $i = $this->at;
         while ($i > 0) {
-
             // Mimic old behavior with mb_substr
-            if ($i >= $this->text_length_chars)
-            {
+            if ($i >= $this->textLengthChars) {
                 $ch = "";
-            }
-            else
-            {
-                $ch = $this->text_array[$i];
+            } else {
+                $ch = $this->textArray[$i];
             }
 
             --$i;
@@ -340,12 +336,12 @@ class HJSONParser
 
         // Count back line endings from there to determine line# of error hit
         for (; $i > 0; $i--) {
-            if ($this->text_array[$i] === "\n") {
+            if ($this->textArray[$i] === "\n") {
                 $line++;
             }
         }
 
-        throw new HJSONException("$m at line $line, $col >>>". implode(array_slice($this->text_array, $this->at - $col, 20)) ." ...");
+        throw new HJSONException("$m at line $line, $col >>>". implode(array_slice($this->textArray, $this->at - $col, 20)) ." ...");
     }
 
     private function next($c = false)
@@ -358,7 +354,7 @@ class HJSONParser
 
         // Get the next character. When there are no more characters,
         // return the empty string.
-        $this->ch = ($this->text_length_chars > $this->at) ? $this->text_array[$this->at] : null;
+        $this->ch = ($this->textLengthChars > $this->at) ? $this->textArray[$this->at] : null;
         ++$this->at;
         return $this->ch;
     }
@@ -373,10 +369,14 @@ class HJSONParser
         $index = $this->at + $offs;
 
         // Mimic old behavior with mb_substr
-        if ($index < 0) $index = 0;
-        if ($index >= $this->text_length_chars) return "";
+        if ($index < 0) {
+            $index = 0;
+        }
+        if ($index >= $this->textLengthChars) {
+            return "";
+        }
 
-        return $this->text_array[$index];
+        return $this->textArray[$index];
     }
 
     private function skipIndent($indent)
@@ -546,18 +546,18 @@ class HJSONParser
         $i;
         $wat--;
         // remove trailing whitespace
-        for ($i = $this->at - 2; $i > $wat && $this->text_array[$i] <= ' ' && $this->text_array[$i] !== "\n"; $i--) {
+        for ($i = $this->at - 2; $i > $wat && $this->textArray[$i] <= ' ' && $this->textArray[$i] !== "\n"; $i--) {
         }
 
         // but only up to EOL
-        if ($this->text_array[$i] === "\n") {
+        if ($this->textArray[$i] === "\n") {
             $i--;
         }
-        if ($this->text_array[$i] === "\r") {
+        if ($this->textArray[$i] === "\r") {
             $i--;
         }
 
-        $res = array_slice($this->text_array, $wat, $i-$wat+1);
+        $res = array_slice($this->textArray, $wat, $i-$wat+1);
         $res_len = count($res);
         for ($i = 0; $i < $res_len; $i++) {
             if ($res[$i] > ' ') {
