@@ -550,10 +550,10 @@ class HJSONParser
         }
 
         // but only up to EOL
-        if ($this->textArray[$i] === "\n") {
+        if ($i > 0 && $this->textArray[$i] === "\n") {
             $i--;
         }
-        if ($this->textArray[$i] === "\r") {
+        if ($i > 0 && $this->textArray[$i] === "\r") {
             $i--;
         }
 
