@@ -315,11 +315,8 @@ class HJSONParser
         $i = $this->at;
         while ($i > 0) {
             $ch = mb_substr(
-                mb_strcut(
-                    $this->text,
-                    $i - 1
-                ),
-                0,
+            	$this->text,
+            	$i - 1,
                 1
             );
             $i -= strlen($ch);
@@ -338,11 +335,8 @@ class HJSONParser
             }
         }
         throw new HJSONException("$m at line $line, $col >>>". mb_substr(
-            mb_strcut(
-                $this->text,
-                $this->at - $colBytes
-            ),
-            0,
+        	$this->text,
+        	$this->at - $colBytes,
             20
         ) ." ...");
     }
@@ -360,11 +354,8 @@ class HJSONParser
         $this->ch =
             strlen($this->text) > $this->at ?
             mb_substr(
-                mb_strcut(
-                    $this->text,
-                    $this->at
-                ),
-                0,
+            	$this->text,
+            	$this->at,
                 1
             ) :
             null
@@ -375,27 +366,11 @@ class HJSONParser
 
     private function peek($offs)
     {
-        // range check is not required
-        if ($offs >= 0) {
-            return mb_substr(
-                mb_strcut(
-                    $this->text,
-                    $this->at
-                ),
-                $offs,
-                1
-            );
-        } else {
-            return mb_substr(
-                mb_strcut(
-                    $this->text,
-                    0,
-                    $this->at
-                ),
-                $offs,
-                1
-            );
-        }
+        return mb_substr(
+        	$this->text,
+        	$this->at + $offs,
+            1
+        );
     }
 
     private function skipIndent($indent)
