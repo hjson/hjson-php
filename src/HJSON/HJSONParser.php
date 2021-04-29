@@ -315,8 +315,8 @@ class HJSONParser
         $i = $this->at;
         while ($i > 0) {
             $ch = mb_substr(
-            	$this->text,
-            	$i - 1,
+                $this->text,
+                $i - 1,
                 1
             );
             $i -= strlen($ch);
@@ -335,8 +335,8 @@ class HJSONParser
             }
         }
         throw new HJSONException("$m at line $line, $col >>>". mb_substr(
-        	$this->text,
-        	$this->at - $colBytes,
+            $this->text,
+            $this->at - $colBytes,
             20
         ) ." ...");
     }
@@ -354,8 +354,8 @@ class HJSONParser
         $this->ch =
             strlen($this->text) > $this->at ?
             mb_substr(
-            	$this->text,
-            	$this->at,
+                $this->text,
+                $this->at,
                 1
             ) :
             null
@@ -367,8 +367,8 @@ class HJSONParser
     private function peek($offs)
     {
         return mb_substr(
-        	$this->text,
-        	$this->at + $offs,
+            $this->text,
+            $this->at + $offs,
             1
         );
     }
