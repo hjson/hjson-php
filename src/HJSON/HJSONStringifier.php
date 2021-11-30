@@ -122,7 +122,7 @@ class HJSONStringifier
 
     private function quote($string = null, $gap = null, $hasComment = null, $isRootObject = null)
     {
-        if ($string === '') {
+        if ($string === '' || $string === null) {
             return '""';
         }
 
