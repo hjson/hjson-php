@@ -10,11 +10,17 @@ jobs:
         include:
           - name: ubuntu-18
             os: ubuntu-18.04
+            php-version: '7.2'
           - name: ubuntu-20
             os: ubuntu-20.04
+            php-version: '7.4'
           - name: ubuntu-latest
             os: ubuntu-latest
     steps:
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php-version }}
+
       - uses: actions/checkout@v2
 
       - name: Validate composer.json and composer.lock
