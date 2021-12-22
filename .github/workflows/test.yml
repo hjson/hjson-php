@@ -1,33 +1,37 @@
 name: test
 on: [push, pull_request]
 jobs:
-  build:
-
-    runs-on: ubuntu-latest
-
-    steps:
-    - uses: actions/checkout@v2
-
-    - name: Validate composer.json and composer.lock
-      run: composer validate --strict
-
-    - name: Cache Composer packages
-      id: composer-cache
-      uses: actions/cache@v2
-      with:
-        path: vendor
-        key: ${{ runner.os }}-php-${{ hashFiles('**/composer.lock') }}
-        restore-keys: |
-          ${{ runner.os }}-php-
-    - name: Install dependencies
-      run: composer install --prefer-dist --no-progress
-
   test:
-    name: linux
-    runs-on: ubuntu-latest
+    name: ${{ matrix.name }}
+    runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
+      matrix:
+        include:
+          - name: ubuntu-18
+            os: ubuntu-18.04
+          - name: ubuntu-20
+            os: ubuntu-20.04
+          - name: ubuntu-latest
+            os: ubuntu-latest
     steps:
+      - uses: actions/checkout@v2
+
+      - name: Validate composer.json and composer.lock
+        run: composer validate --strict
+
+      - name: Cache Composer packages
+        id: composer-cache
+        uses: actions/cache@v2
+        with:
+          path: vendor
+          key: ${{ runner.os }}-php-${{ hashFiles('**/composer.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-php-
+
+      - name: Install dependencies
+        run: composer install --prefer-dist --no-progress
+
       - name: phpcs
         run: ./vendor/bin/phpcs -n --standard=PSR2 src/ tests/
 
