@@ -8,16 +8,27 @@ jobs:
       fail-fast: false
       matrix:
         include:
+          - name: php-5.6
+            os: ubuntu-18.04
+            php-version: '5.6'
+          - name: php-7.0
+            os: ubuntu-18.04
+            php-version: '7.0'
+          - name: php-7.1
+            os: ubuntu-18.04
+            php-version: '7.1'
           - name: ubuntu-18
             os: ubuntu-18.04
             php-version: '7.2'
           - name: ubuntu-20
             os: ubuntu-20.04
             php-version: '7.4'
-          - name: ubuntu-latest
-            os: ubuntu-latest
+# phpunit 5 and 6 require php < 8
+#          - name: ubuntu-latest
+#            os: ubuntu-latest
     steps:
-      - uses: shivammathur/setup-php@v2
+      - if: ${{ matrix.php-version }}
+        uses: shivammathur/setup-php@v2
         with:
           php-version: ${{ matrix.php-version }}
 
@@ -25,15 +36,6 @@ jobs:
 
       - name: Validate composer.json and composer.lock
         run: composer validate --strict
-
-      - name: Cache Composer packages
-        id: composer-cache
-        uses: actions/cache@v2
-        with:
-          path: vendor
-          key: ${{ runner.os }}-php-${{ hashFiles('**/composer.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-php-
 
       - name: Install dependencies
         run: composer install --prefer-dist --no-progress
