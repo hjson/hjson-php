@@ -23,9 +23,8 @@ jobs:
           - name: ubuntu-20
             os: ubuntu-20.04
             php-version: '7.4'
-# phpunit 5 and 6 require php < 8
-#          - name: ubuntu-latest
-#            os: ubuntu-latest
+          - name: ubuntu-latest
+            os: ubuntu-latest
     steps:
       - if: ${{ matrix.php-version }}
         uses: shivammathur/setup-php@v2
@@ -43,5 +42,5 @@ jobs:
       - name: phpcs
         run: ./vendor/bin/phpcs -n --standard=PSR2 src/ tests/
 
-      - name: phpunit
-        run: ./vendor/bin/phpunit
+      - name: tests
+        run: php ./tests/HJSONParserTest.php
