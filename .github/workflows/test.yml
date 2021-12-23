@@ -42,5 +42,8 @@ jobs:
       - name: phpcs
         run: ./vendor/bin/phpcs -n --standard=PSR2 src/ tests/
 
+      - name: PHP version
+        run: php -v
+
       - name: tests
         run: php ./tests/HJSONParserTest.php
