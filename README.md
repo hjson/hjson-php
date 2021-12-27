@@ -1,6 +1,6 @@
 # hjson-php
 
-[![Build Status](https://img.shields.io/travis/hjson/hjson-php.svg?style=flat-square)](http://travis-ci.org/hjson/hjson-php)
+[![Build Status](https://github.com/hjson/hjson-php/workflows/test/badge.svg)](https://github.com/hjson/hjson-php/actions)
 [![Packagist](https://img.shields.io/packagist/v/laktak/hjson.svg?style=flat-square)](https://packagist.org/packages/laktak/hjson)
 
 [Hjson](https://hjson.github.io), the Human JSON. A configuration file format for humans. Relaxed syntax, fewer mistakes, more comments.

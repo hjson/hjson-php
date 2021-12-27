@@ -1,0 +1,49 @@
+name: test
+on: [push, pull_request]
+jobs:
+  test:
+    name: ${{ matrix.name }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: php-5.6
+            os: ubuntu-18.04
+            php-version: '5.6'
+          - name: php-7.0
+            os: ubuntu-18.04
+            php-version: '7.0'
+          - name: php-7.1
+            os: ubuntu-18.04
+            php-version: '7.1'
+          - name: ubuntu-18
+            os: ubuntu-18.04
+            php-version: '7.2'
+          - name: ubuntu-20
+            os: ubuntu-20.04
+            php-version: '7.4'
+          - name: ubuntu-latest
+            os: ubuntu-latest
+    steps:
+      - if: ${{ matrix.php-version }}
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php-version }}
+
+      - uses: actions/checkout@v2
+
+      - name: Validate composer.json and composer.lock
+        run: composer validate --strict
+
+      - name: Install dependencies
+        run: composer install --prefer-dist --no-progress
+
+      - name: phpcs
+        run: ./vendor/bin/phpcs -n --standard=PSR2 src/ tests/
+
+      - name: PHP version
+        run: php -v
+
+      - name: tests
+        run: php ./tests/HJSONParserTest.php

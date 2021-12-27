@@ -2,22 +2,65 @@
 
 namespace HJSON\Tests;
 
+require_once('src/HJSON/HJSONParser.php');
+require_once('src/HJSON/HJSONStringifier.php');
+require_once('src/HJSON/HJSONException.php');
+require_once('src/HJSON/HJSONUtils.php');
+
 use HJSON\HJSONParser;
 use HJSON\HJSONStringifier;
 use HJSON\HJSONException;
-use PHPUnit\Framework\TestCase;
 
-class HJSONParserTest extends TestCase
+class HJSONParserTest
 {
 
-    protected function setUp()
+    public function assertEquals($a, $b)
     {
-        parent::setUp();
+        if ($a !== $b) {
+            echo "\n\n";
+            $a2 = preg_split('/\r\n|\r|\n/', $a);
+            $b2 = preg_split('/\r\n|\r|\n/', $b);
+            $indexA = $indexB = 0;
+            for (; $indexB < count($b2); $indexA++, $indexB++) {
+                if ($indexB >= count($a2) || $b2[$indexB] !== $a2[$indexB]) {
+                    $indexA = $indexB;
+                    echo "Expected ($this->lastFilename, line $indexB):\n\n";
+                    while ($indexB < count($b2) && (
+                           $indexB >= count($a2) ||
+                           $b2[$indexB] !== $a2[$indexB])) {
+                        echo "|".$b2[$indexB++]."|\n";
+                    }
+
+                    echo "\n\nGot:\n\n";
+                    while ($indexA < count($a2) && $indexA < $indexB) {
+                        echo "|".$a2[$indexA++]."|\n";
+                    }
+
+                    echo "\n\n";
+                }
+            }
+
+            if ($indexA < count($a2)) {
+                echo "\n\nGot trailing lines vs $this->lastFilename:\n\n";
+                while ($indexA < count($a2)) {
+                    echo "|".$a2[$indexA++]."|\n";
+                }
+                echo "\n\n";
+            }
+
+            throw new HJSONException();
+        }
+    }
+
+    public function setUp()
+    {
         $this->rootDir = dirname(__FILE__).DIRECTORY_SEPARATOR."assets";
+        $this->lastFilename = '';
     }
 
     private function load($file, $cr)
     {
+        $this->lastFilename = $file;
         $text = file_get_contents($this->rootDir.DIRECTORY_SEPARATOR.$file);
         $std = mb_ereg_replace('/\r/', "", $text); // make sure we have unix style text regardless of the input
         return $cr ? mb_ereg_replace("\n", "\r\n", $std) : $std;
@@ -37,6 +80,13 @@ class HJSONParserTest extends TestCase
             $this->assertEquals($arrayData, json_decode(json_encode($data), true));
 
             if (!$shouldFail) {
+                if ($isJson) {
+                    // compare Hjson parse to JSON parse
+                    $json1 = json_encode($data);
+                    $json2 = json_encode(json_decode($text));
+                    $this->assertEquals($json1, $json2);
+                }
+
                 $text1 = json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
                 $stringifier = new HJSONStringifier();
                 $hjson1 = $stringifier->stringify($data, [
@@ -46,15 +96,9 @@ class HJSONParserTest extends TestCase
                 ]);
                 $result = json_decode($this->load("{$name}_result.json", $inputCr));
                 $text2 = json_encode($result, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
-                $hjson2 = $this->load("{$name}_result.hjson", $outputCr);
                 $this->assertEquals($text1, $text2);
+                $hjson2 = $this->load("{$name}_result.hjson", $outputCr);
                 $this->assertEquals($hjson1, $hjson2);
-                if ($isJson) {
-                    // also compare Hjson parse to JSON parse
-                    $json1 = json_encode($data);
-                    $json2 = json_encode(json_decode($text));
-                    $this->assertEquals($json1, $json2);
-                }
             } else {
                 $this->markTestIncomplete('This test succeeded on data that should fail.');
             }
@@ -67,6 +111,7 @@ class HJSONParserTest extends TestCase
 
     public function testAll()
     {
+        $hasFailure = false;
         $files = array_diff(scandir($this->rootDir), ['..', '.']);
         foreach ($files as $file) {
             $name = explode('_test.', $file);
@@ -81,10 +126,34 @@ class HJSONParserTest extends TestCase
                 continue;
             }
 
-            $this->runEach($name, $file, $isJson, false, false);
-            $this->runEach($name, $file, $isJson, false, true);
-            $this->runEach($name, $file, $isJson, true, false);
-            $this->runEach($name, $file, $isJson, true, true);
+            try {
+                $this->runEach($name, $file, $isJson, false, false);
+            } catch (HJSONException $e) {
+                $hasFailure = true;
+            }
+            try {
+                $this->runEach($name, $file, $isJson, false, true);
+            } catch (HJSONException $e) {
+                $hasFailure = true;
+            }
+            try {
+                $this->runEach($name, $file, $isJson, true, false);
+            } catch (HJSONException $e) {
+                $hasFailure = true;
+            }
+            try {
+                $this->runEach($name, $file, $isJson, true, true);
+            } catch (HJSONException $e) {
+                $hasFailure = true;
+            }
+        }
+
+        if ($hasFailure) {
+            exit(1);
         }
     }
 }
+
+$tester = new HJSONParserTest;
+$tester->setUp();
+$tester->testAll();
