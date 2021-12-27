@@ -104,6 +104,7 @@ class HJSONParserTest
             }
         } catch (HJSONException $e) {
             if (!$shouldFail) {
+                echo "\n$e\n";
                 throw $e;
             }
         }
