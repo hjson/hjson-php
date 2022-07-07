@@ -155,6 +155,6 @@ class HJSONParserTest
     }
 }
 
-$tester = new HJSONParserTest;
+$tester = new HJSONParserTest();
 $tester->setUp();
 $tester->testAll();
