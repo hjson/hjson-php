@@ -211,12 +211,12 @@ class HJSONParser
     {
         // Parse an object value.
         $key = null;
-        $object = new \stdClass;
+        $object = new \stdClass();
         $kw = null;
         $wat = null;
         if ($this->keepWsc) {
-            $kw = new \stdClass;
-            $kw->c = new \stdClass;
+            $kw = new \stdClass();
+            $kw->c = new \stdClass();
             $kw->o = [];
             $object->__WSC__ = $kw;
             if ($withoutBraces) {

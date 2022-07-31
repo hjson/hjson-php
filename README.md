@@ -43,7 +43,7 @@ use HJSON\HJSONStringifier;
 $parser = new HJSONParser();
 $obj = $parser->parse(hjsonText);
 
-$stringifier = new HJSONStringifier;
+$stringifier = new HJSONStringifier();
 $text = $stringifier->stringify($obj);
 ```
 
@@ -79,8 +79,8 @@ This method produces Hjson text from a value.
 You can modify a Hjson file and keep the whitespace & comments intact. This is useful if an app updates its config file.
 
 ```
-$parser = new HJSONParser;
-$stringifier = new HJSONStringifier;
+$parser = new HJSONParser();
+$stringifier = new HJSONStringifier();
 
 $text = "{
   # specify rate in requests/second (because comments are helpful!)
