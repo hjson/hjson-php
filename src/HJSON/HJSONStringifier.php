@@ -24,6 +24,7 @@ class HJSONStringifier
     private $needsEscapeName = '/[,\{\[\}\]\s:#"\']|\/\/|\/\*|\'\'\'/';
     private $gap = '';
     private $indent = '  ';
+	private $meta = null;
 
     // options
     private $eol;
