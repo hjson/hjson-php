@@ -40,7 +40,7 @@ jobs:
         with:
           php-version: ${{ matrix.php-version }}
 
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
 
       - name: Validate composer.json and composer.lock
         run: composer validate --strict
