@@ -30,6 +30,11 @@
     '''
   multiline4: ←→±≠Я
   multiline5: åäö
+  multiline6:
+    '''
+    bar
+    0
+    '''
   foo1a: asdf\"'a\s\w
   foo1b: asdf\"'a\s\w
   foo1c: asdf\"'a\s\w

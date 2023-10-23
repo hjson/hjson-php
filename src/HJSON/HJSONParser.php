@@ -171,7 +171,7 @@ class HJSONParser
         $this->white();
         if ($kw !== null) {
             $c = $this->getComment($wat);
-            if (trim($c)) {
+            if (trim($c) !== '') {
                 $kw[] = $c;
             }
         }
@@ -193,7 +193,7 @@ class HJSONParser
             }
             if ($kw !== null) {
                 $c = $this->getComment($wat);
-                if (trim($c)) {
+                if (trim($c) !== '') {
                     $kw[] = $c;
                 }
             }
@@ -276,7 +276,7 @@ class HJSONParser
     private function pushWhite($key, &$kw, $wat)
     {
         $kw->c->$key = $this->getComment($wat);
-        if (trim($key)) {
+        if (trim($key) !== '') {
             $kw->o[] = $key;
         }
     }
@@ -348,7 +348,7 @@ class HJSONParser
     {
         // If a c parameter is provided, verify that it matches the current character.
 
-        if ($c && $c !== $this->ch) {
+        if ($c !== false && $c !== $this->ch) {
             $this->error("Expected '$c' instead of '{$this->ch}'");
         }
 

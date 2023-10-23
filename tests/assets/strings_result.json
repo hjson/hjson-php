@@ -14,6 +14,7 @@
   "multiline3": "first line\n  indented line\nlast line\n",
   "multiline4": "←→±≠Я",
   "multiline5": "åäö",
+  "multiline6": "bar\n0",
   "foo1a": "asdf\\\"'a\\s\\w",
   "foo1b": "asdf\\\"'a\\s\\w",
   "foo1c": "asdf\\\"'a\\s\\w",

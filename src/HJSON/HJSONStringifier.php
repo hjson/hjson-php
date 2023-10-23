@@ -168,7 +168,7 @@ class HJSONStringifier
             $res = $this->eol . $gap . "'''";
             for ($i = 0; $i < count($a); $i++) {
                 $res .= $this->eol;
-                if ($a[$i]) {
+                if ($a[$i] !== '') {
                     $res .= $gap . $a[$i];
                 }
             }
@@ -178,7 +178,7 @@ class HJSONStringifier
 
     private function quoteName($name)
     {
-        if (!$name) {
+        if ($name === '') {
             return '""';
         }
 
@@ -202,7 +202,7 @@ class HJSONStringifier
             return $str && !$startsWithNL($str);
         };
         $wsc = function ($str) {
-            if (!$str) {
+            if ($str === '') {
                 return "";
             }
             for ($i = 0; $i < mb_strlen($str); $i++) {
