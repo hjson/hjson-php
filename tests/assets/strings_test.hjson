@@ -47,6 +47,8 @@
     åäö
     '''
 
+  multiline6: "bar\n0"
+
   # escapes/no escape
 
   foo1a: asdf\"'a\s\w
