@@ -17,6 +17,14 @@ class HJSONParserTest
     public function assertEquals($a, $b)
     {
         if ($a !== $b) {
+//            for ($i=0; $i<strlen($a); $i++) {
+//                echo ord($a[$i]).' ';
+//            }
+//            echo "\n";
+//            for ($i=0; $i<strlen($b); $i++) {
+//                echo ord($b[$i]).' ';
+//            }
+
             echo "\n\n";
             $a2 = preg_split('/\r\n|\r|\n/', $a);
             $b2 = preg_split('/\r\n|\r|\n/', $b);
@@ -93,7 +101,7 @@ class HJSONParserTest
                     'eol' => $outputCr ? "\r\n" : "\n",
                     'emitRootBraces' => true,
                     'space' => 2
-                ]);
+                ]).($outputCr ? "\r" : "")."\n";
                 $result = json_decode($this->load("{$name}_result.json", $inputCr));
                 $text2 = json_encode($result, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
                 $this->assertEquals($text1, $text2);
