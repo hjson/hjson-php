@@ -368,9 +368,8 @@ class HJSONParser
     {
         $index = $this->at + $offs;
 
-        // Mimic old behavior with mb_substr
         if ($index < 0) {
-            $index = 0;
+            return null;
         }
         if ($index >= $this->textLengthChars) {
             return "";
