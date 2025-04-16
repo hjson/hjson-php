@@ -11,6 +11,8 @@ class HJSONParser
     private $ch;   // The current character
     private $escapee = [];
     private $keepWsc; // keep whitespace
+    private $maxNestingDepth = 10000;
+    private $nestingDepth;
 
     public function __construct()
     {
@@ -44,6 +46,7 @@ class HJSONParser
 
     private function resetAt()
     {
+        $this->nestingDepth = 0;
         $this->at = 0;
         $this->ch = ' ';
     }
@@ -99,9 +102,15 @@ class HJSONParser
         $this->white();
         switch ($this->ch) {
             case '{':
-                return $this->object();
+                $this->nestingDepth++;
+                $ret = $this->object();
+                $this->nestingDepth--;
+                return $ret;
             case '[':
-                return $this->_array();
+                $this->nestingDepth++;
+                $ret = $this->_array();
+                $this->nestingDepth--;
+                return $ret;
             case '"':
                 return $this->string('"');
             case '\'':
@@ -157,6 +166,10 @@ class HJSONParser
         // Parse an array value.
         // assumeing ch === '['
 
+        if ($this->nestingDepth > $this->maxNestingDepth) {
+            $this->error("Exceeded max depth (".$this->maxNestingDepth.")");
+        }
+
         $array = [];
         $kw = null;
         $wat = null;
@@ -210,6 +223,11 @@ class HJSONParser
     private function object($withoutBraces = false)
     {
         // Parse an object value.
+
+        if ($this->nestingDepth > $this->maxNestingDepth) {
+            $this->error("Exceeded max depth (".$this->maxNestingDepth.")");
+        }
+
         $key = null;
         $object = new \stdClass();
         $kw = null;
