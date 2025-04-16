@@ -167,7 +167,7 @@ class HJSONParser
         // assumeing ch === '['
 
         if ($this->nestingDepth > $this->maxNestingDepth) {
-          $this->error("Exceeded max depth (".$this->maxNestingDepth.")");
+            $this->error("Exceeded max depth (".$this->maxNestingDepth.")");
         }
 
         $array = [];
@@ -225,7 +225,7 @@ class HJSONParser
         // Parse an object value.
 
         if ($this->nestingDepth > $this->maxNestingDepth) {
-          $this->error("Exceeded max depth (".$this->maxNestingDepth.")");
+            $this->error("Exceeded max depth (".$this->maxNestingDepth.")");
         }
 
         $key = null;
