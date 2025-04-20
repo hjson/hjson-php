@@ -101,8 +101,6 @@ class HJSONStringifier
 
     private function quoteReplace($string)
     {
-        mb_ereg_search_init($string, $this->needsEscape);
-        $r = mb_ereg_search();
         $chars = mb_str_split($string);
         $chars = array_map(function ($char) {
             if (preg_match($this->needsEscape, $char)) {
@@ -111,7 +109,7 @@ class HJSONStringifier
                 if (gettype($c) === 'string') {
                     return $c;
                 } else {
-                    return $char;
+                    return substr(json_encode($char), 1, -1);
                 }
             } else {
                 return $char;
