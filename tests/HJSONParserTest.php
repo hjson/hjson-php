@@ -79,6 +79,7 @@ class HJSONParserTest
         echo "Running test for $name, $file, ".(+$isJson).', '.(+$inputCr).', '.(+$outputCr)."\n";
         $text = $this->load($file, $inputCr);
         $shouldFail = substr($name, 0, 4) === "fail";
+        $unexpectedPass = false;
 
         try {
             $parser = new HJSONParser();
@@ -108,13 +109,18 @@ class HJSONParserTest
                 $hjson2 = $this->load("{$name}_result.hjson", $outputCr);
                 $this->assertEquals($hjson1, $hjson2);
             } else {
-                $this->markTestIncomplete('This test succeeded on data that should fail.');
+                $unexpectedPass = true;
             }
         } catch (HJSONException $e) {
             if (!$shouldFail) {
                 echo "\n$e\n";
                 throw $e;
             }
+        }
+
+        if ($unexpectedPass) {
+            echo "This test succeeded on data that should fail.\n";
+            throw new HJSONException();
         }
     }
 
